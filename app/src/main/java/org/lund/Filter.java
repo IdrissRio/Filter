@@ -29,6 +29,7 @@
  */
 
 package org.lund;
+import CLI.src.Format;
 import CLI.src.Table;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -44,6 +45,9 @@ public class Filter {
   // public static ArrayList<String> userFilter = new ArrayList<String>();
   public static ArrayList<HashMap<String, String>> userFilter =
       new ArrayList<HashMap<String, String>>();
+
+  public static Format genformat = Format.FANCY;
+  public static Format readformat = Format.FANCY;
 
   public static Table table;
 
@@ -70,6 +74,42 @@ public class Filter {
           userFilter.add(newHashMap);
         }
         continue;
+      } else if (opt.startsWith("-gen=")) {
+        opt = opt.substring(5, opt.length());
+        switch (opt) {
+        case "csv":
+          genformat = Format.CSV;
+          continue;
+        case "tab":
+          genformat = Format.TAB;
+          continue;
+        case "fancy":
+          genformat = Format.FANCY;
+          continue;
+
+        default:
+          System.err.println("error");
+          System.exit(1);
+          break;
+        }
+      } else if (opt.startsWith("-read=")) {
+        opt = opt.substring(6, opt.length());
+        switch (opt) {
+        case "csv":
+          readformat = Format.CSV;
+          continue;
+        case "tab":
+          readformat = Format.TAB;
+          continue;
+        case "fancy":
+          readformat = Format.FANCY;
+          continue;
+
+        default:
+          System.err.println("error");
+          System.exit(1);
+          break;
+        }
       }
       System.err.println("Error: unrecognized option: " + opt);
       printOptionsUsage();
@@ -80,7 +120,8 @@ public class Filter {
   public static void main(String args[]) throws FileNotFoundException {
     Filter filter = new Filter();
     filter.setEnv(args);
-    table = new Table(System.in); // Reading and creting  a table from stdin
+    table = new Table(System.in, genformat,
+                      readformat); // Reading and creting  a table from stdin
     for (HashMap<String, String> map : userFilter) {
       for (Map.Entry<String, String> entry : map.entrySet()) {
         String column = entry.getKey();
